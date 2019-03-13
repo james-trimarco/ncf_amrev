@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "James Trimarco"
+date: "2/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+t <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/word_counts_in_text_trm.csv')
+names(t) <- c("length", "duplicates_removed")
+#t$length <- as.character(t$length)
+
+t_o <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/word_counts_in_text_old.csv')
+names(t_o) <- c("length", "duplicates_present")
+#t_o$length <- as.character(t_o$length)
+
+str(t)
+
+data <- t %>%
+    left_join(t_o) %>%
+    gather(key = version, value = count, -length)
+    
+
+ggplot(data, aes(x = length, y = count, fill = version, color = version)) +
+    theme_classic() +
+    scale_x_continuous(limits = c(0, 500)) +
+    geom_bar(stat = 'identity', alpha = .5) +
+    labs(title = "Effect of Removing Duplicates on Review Word Count", 
+         x = "Length of Review Text in Words", 
+         y = "Number of Reviews")
+```
+
+
+```{r fig.height=4, fig.width=5}
+w <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/word_counts_by_score.csv')
+
+names(w) <- c("score", "length", "freq")
+my_blue <- wes_palette("Zissou1")[1]
+w$score <- as.factor(w$score)
+levels(w$score) <- c(1, 2, 3, 4, 5)
+
+dummy2 <- data.frame(score = as.factor(c(1, 2, 3, 4, 5)), 
+                     Z = c(24.47, 24.90, 26.08, 24.83, 22.56))
+
+
+
+ggplot(w, aes(x = length, y = freq)) +
+    scale_x_continuous(limits = c(0, 100)) +
+    scale_y_continuous() +
+    geom_bar(stat='identity', fill = my_blue, color = my_blue) +
+    facet_grid(rows = vars(score), scales = "free_y") +
+    labs(title = "Distribution of Word Count by Score", 
+         x = "Length of Review Text", 
+         y = "Frequency") +
+    geom_vline(data = dummy2, aes(xintercept = Z), color = 'red') +
+    theme(plot.title = element_text(size = 22)) 
+```
+
+```{r}
+h <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/helpfulness_fl_dist.csv')
+
+h <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/helpfulness_fl_dist_round2.csv')
+
+names(h) <- c("help", "freq")
+
+h <- h %>%
+    filter(help < 1 & help > 0) 
+
+ggplot(h, aes(x = help, y = freq)) +
+    geom_bar(stat = 'identity', fill = my_blue, color = my_blue) +
+    labs(title = "Distribution of Helpfulness Rates", 
+         subtitle = "Filtered so that total > 5 and 0 < score < 1",
+         x = "Helpfulness Score", 
+         y = "Frequency")
+
+```
+
+
+```{r}
+totals <- read_csv('/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/output/helpfulness_totals.csv')
+
+names(totals) <- c("total", "freq")
+
+ggplot(totals, aes(x = total, y = freq)) +
+    geom_bar(stat = 'identity', fill = my_blue, color = my_blue) +
+    scale_x_continuous(limits = c(0, 100)) +
+    scale_y_continuous(labels = scales::comma, limits = c(0, 150000)) +
+    labs(title = "Distribution of Helpfulness Denominators", 
+         x = "Helpfulness Denominator", 
+         y = "Frequency")
+
+```
+

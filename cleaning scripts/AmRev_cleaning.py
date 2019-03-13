@@ -6,7 +6,7 @@ import re
 # 1. Set up file locations
 ###
 input_filename = "/Users/james/Desktop/finefoods.txt"
-output_filename = "/Users/james/Desktop/sm_output_test.csv"
+output_filename = "/Users/james/Documents/NCDS/Semester_2/Projects/AmRev/test.csv"
  
    
 ###
@@ -56,7 +56,7 @@ for cell in yourList:
         productId = cell[19:] # Store the productId
     
     elif cell[:11] == 'review/user':
-        userId = cell[14:]
+        userId = cell[15:]
         
     elif cell[:11] == 'review/prof':
         profileName = cell[20:]
